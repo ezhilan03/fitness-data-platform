@@ -1,0 +1,24 @@
+test_bad_contract_rejects_entire_batch (test_pipeline.PipelineTests.test_bad_contract_rejects_entire_batch) ... ok
+test_conflicting_revision_rolls_back_prior_insert (test_pipeline.PipelineTests.test_conflicting_revision_rolls_back_prior_insert) ... ok
+test_correction_moving_week_removes_old_week (test_pipeline.PipelineTests.test_correction_moving_week_removes_old_week) ... ok
+test_correction_replaces_current_but_preserves_history (test_pipeline.PipelineTests.test_correction_replaces_current_but_preserves_history) ... ok
+test_distinct_overlapping_workouts_are_flagged_not_dropped (test_pipeline.PipelineTests.test_distinct_overlapping_workouts_are_flagged_not_dropped) ... ok
+test_dst_fall_back_uses_elapsed_utc_time (test_pipeline.PipelineTests.test_dst_fall_back_uses_elapsed_utc_time) ... ok
+test_dst_spring_forward_uses_elapsed_utc_time (test_pipeline.PipelineTests.test_dst_spring_forward_uses_elapsed_utc_time) ... ok
+test_erasure_removes_history_and_mart_and_blocks_replay (test_pipeline.PipelineTests.test_erasure_removes_history_and_mart_and_blocks_replay) ... ok
+test_event_cannot_switch_session_identity (test_pipeline.PipelineTests.test_event_cannot_switch_session_identity) ... ok
+test_failed_refresh_preserves_previous_mart_and_recovery_succeeds (test_pipeline.PipelineTests.test_failed_refresh_preserves_previous_mart_and_recovery_succeeds) ... ok
+test_future_availability_rejected (test_pipeline.PipelineTests.test_future_availability_rejected) ... ok
+test_late_arrival_updates_event_week_not_receipt_week (test_pipeline.PipelineTests.test_late_arrival_updates_event_week_not_receipt_week) ... ok
+test_local_week_is_not_utc_week (test_pipeline.PipelineTests.test_local_week_is_not_utc_week) ... ok
+test_miles_are_normalized (test_pipeline.PipelineTests.test_miles_are_normalized) ... ok
+test_missing_distance_and_days_do_not_become_zero (test_pipeline.PipelineTests.test_missing_distance_and_days_do_not_become_zero) ... ok
+test_older_revision_arriving_last_does_not_downgrade (test_pipeline.PipelineTests.test_older_revision_arriving_last_does_not_downgrade) ... ok
+test_same_export_is_noop (test_pipeline.PipelineTests.test_same_export_is_noop) ... ok
+test_same_source_cannot_claim_identity_twice (test_pipeline.PipelineTests.test_same_source_cannot_claim_identity_twice) ... ok
+test_source_priority_collapses_only_explicit_shared_identity (test_pipeline.PipelineTests.test_source_priority_collapses_only_explicit_shared_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.013s
+
+OK

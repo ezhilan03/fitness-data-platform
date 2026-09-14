@@ -1,0 +1,29 @@
+{
+  "as_of": "2030-01-01T00:00:00Z",
+  "coverage": "observed sessions only; missing days are unknown",
+  "overlapping_session_pairs": 1,
+  "weeks": [
+    {
+      "user_id": "synthetic-alex",
+      "week_start": "2026-09-07",
+      "activity": "run",
+      "sessions": 1,
+      "observed_days": 1,
+      "duration_seconds": 1800,
+      "distance_m": 5000.0,
+      "distance_observed_sessions": 1,
+      "as_of": "2030-01-01T00:00:00Z"
+    },
+    {
+      "user_id": "synthetic-alex",
+      "week_start": "2026-09-07",
+      "activity": "strength",
+      "sessions": 1,
+      "observed_days": 1,
+      "duration_seconds": 1800,
+      "distance_m": null,
+      "distance_observed_sessions": 0,
+      "as_of": "2030-01-01T00:00:00Z"
+    }
+  ]
+}

@@ -75,6 +75,13 @@ try:
     report['scheduled_ingestion_tasks']=len(ingested)
     report['recovered_task']=query("select run_id,state,try_number from task_instance where dag_id='fitness_daily' and try_number>1")
     before=json.loads((STATE/'published/latest.json').read_text())
+    summary=json.loads((Path(before['run_dir'])/'summary.json').read_text())
+    assert sum(row['sessions'] for row in summary['weeks'])==2
+    assert sum(row['distance_m'] or 0 for row in summary['weeks'])==5000
+    with sqlite3.connect(STATE/'source.db') as source:
+        assert source.execute('select count(*) from revisions').fetchone()[0]==3
+    report['scheduled_source_revisions']=3
+    report['scheduled_running_distance_m']=5000
     cli('backfill','create','--dag-id','fitness_daily','--from-date','2026-09-08','--to-date','2026-09-09','--reprocess-behavior','completed','--max-active-runs','1')
     report['backfill_intervals']=wait_for(lambda: (rows if len(rows)==2 and all(r['state']=='success' for r in rows) else None)
         if (rows:=query("select run_id,state,data_interval_start,data_interval_end from dag_run where dag_id='fitness_daily' and run_type='backfill'")) else None,seconds=240)

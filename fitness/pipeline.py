@@ -133,6 +133,8 @@ def refresh(conn, as_of):
     try:
         conn.execute('DROP TABLE IF EXISTS temp.current_sessions')
         conn.execute('CREATE TEMP TABLE current_sessions AS '+(ROOT/'sql/current_sessions.sql').read_text(),{'as_of':cutoff})
+        conn.execute('DELETE FROM incremental_state')
+        conn.execute('DROP TABLE IF EXISTS session_snapshot')
         conn.execute('DELETE FROM weekly_summaries')
         conn.execute((ROOT/'sql/weekly_summaries.sql').read_text(),{'as_of':cutoff})
         summaries=[dict(row) for row in conn.execute('SELECT * FROM weekly_summaries ORDER BY user_id,week_start,activity')]
@@ -153,6 +155,8 @@ def erase_user(conn, user_id):
     conn.execute('BEGIN IMMEDIATE')
     try:
         count=conn.execute('DELETE FROM revisions WHERE user_id=?',(user_id,)).rowcount
+        if conn.execute("SELECT 1 FROM sqlite_master WHERE name='session_snapshot'").fetchone():
+            conn.execute('DELETE FROM session_snapshot WHERE user_id=?',(user_id,))
         conn.execute('DELETE FROM weekly_summaries WHERE user_id=?',(user_id,))
         conn.execute('INSERT OR IGNORE INTO erased_users VALUES (?)',(hashlib.sha256(user_id.encode()).hexdigest(),))
         conn.execute('COMMIT')
@@ -160,3 +164,51 @@ def erase_user(conn, user_id):
         conn.execute('ROLLBACK')
         raise
     return {'removed_revisions':count,'scope':'logical deletion from local tables; external exports/backups not covered'}
+
+
+def refresh_incremental(conn, as_of):
+    """Replace affected user/week/activity partitions, retaining a current snapshot.
+
+    Source selection still scans revision history. This optimizes mart aggregation,
+    not source reading, and is verified against full refresh rather than benchmarked.
+    """
+    cutoff = utc(as_of)
+    conn.execute('BEGIN IMMEDIATE')
+    try:
+        state = conn.execute('SELECT as_of FROM incremental_state WHERE singleton=1').fetchone()
+        if state and cutoff < state[0]:
+            raise ContractError('Incremental cutoff cannot move backward; use full refresh')
+        conn.execute('DROP TABLE IF EXISTS temp.current_sessions')
+        conn.execute('CREATE TEMP TABLE current_sessions AS '+(ROOT/'sql/current_sessions.sql').read_text(),{'as_of':cutoff})
+        conn.execute('CREATE TABLE IF NOT EXISTS session_snapshot AS SELECT * FROM current_sessions WHERE 0')
+        old = {(r['user_id'],r['session_id']):dict(r) for r in conn.execute('SELECT * FROM session_snapshot')}
+        new = {(r['user_id'],r['session_id']):dict(r) for r in conn.execute('SELECT * FROM current_sessions')}
+        affected = set()
+        for key in old.keys() | new.keys():
+            if old.get(key) != new.get(key):
+                for row in [old.get(key),new.get(key)]:
+                    if row:
+                        affected.add((row['user_id'],row['week_start'],row['activity']))
+        if state is None:
+            # A previous full refresh may contain a different historical cutoff.
+            affected.update(tuple(r) for r in conn.execute('SELECT user_id,week_start,activity FROM weekly_summaries'))
+            affected.update((r['user_id'],r['week_start'],r['activity']) for r in new.values())
+        for user,week,activity in sorted(affected):
+            conn.execute('DELETE FROM weekly_summaries WHERE user_id=? AND week_start=? AND activity=?',(user,week,activity))
+            conn.execute("""INSERT INTO weekly_summaries
+                SELECT user_id,week_start,activity,COUNT(*),COUNT(DISTINCT local_date),
+                       SUM(duration_seconds),SUM(distance_m),COUNT(distance_m),?
+                FROM current_sessions WHERE user_id=? AND week_start=? AND activity=?
+                GROUP BY user_id,week_start,activity""",(cutoff,user,week,activity))
+        # as_of denotes knowledge cutoff, even for unchanged aggregate values.
+        conn.execute('UPDATE weekly_summaries SET as_of=?',(cutoff,))
+        conn.execute('DELETE FROM session_snapshot')
+        conn.execute('INSERT INTO session_snapshot SELECT * FROM current_sessions')
+        conn.execute('INSERT OR REPLACE INTO incremental_state VALUES (1,?)',(cutoff,))
+        rows = [dict(r) for r in conn.execute('SELECT * FROM weekly_summaries ORDER BY user_id,week_start,activity')]
+        conn.execute('DROP TABLE current_sessions')
+        conn.execute('COMMIT')
+    except BaseException:
+        conn.execute('ROLLBACK')
+        raise
+    return {'as_of':cutoff,'partitions_rebuilt':len(affected),'weeks':rows}

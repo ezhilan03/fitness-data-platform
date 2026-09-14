@@ -12,10 +12,13 @@ jobs:
           python-version: '3.11'
       - run: python -m unittest discover -s tests -v
       - run: python -m fitness.demo > demo-report.json
+      - run: python -m fitness.incremental_demo > incremental-report.json
       - run: docker build -t fitness-data .
       - run: docker run --rm fitness-data python -m unittest discover -s tests -v
       - run: docker run --rm fitness-data
       - uses: actions/upload-artifact@v4
         with:
           name: fitness-demo-evidence
-          path: demo-report.json
+          path: |
+            demo-report.json
+            incremental-report.json

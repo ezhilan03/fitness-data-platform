@@ -1,0 +1,21 @@
+{
+  "synthetic_only": true,
+  "steps": [
+    {
+      "step": "baseline",
+      "partitions_rebuilt": 2,
+      "matches_full_refresh": true
+    },
+    {
+      "step": "corrections",
+      "partitions_rebuilt": 1,
+      "matches_full_refresh": true
+    },
+    {
+      "step": "unchanged replay",
+      "partitions_rebuilt": 0,
+      "matches_full_refresh": true
+    }
+  ],
+  "passed": true
+}

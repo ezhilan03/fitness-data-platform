@@ -1,3 +1,8 @@
+test_backward_cutoff_requires_full_refresh (test_incremental.IncrementalTests.test_backward_cutoff_requires_full_refresh) ... ok
+test_initial_replay_and_unchanged_partition (test_incremental.IncrementalTests.test_initial_replay_and_unchanged_partition) ... ok
+test_late_source_priority_and_erasure (test_incremental.IncrementalTests.test_late_source_priority_and_erasure) ... ok
+test_moved_week_rebuilds_both_old_and_new (test_incremental.IncrementalTests.test_moved_week_rebuilds_both_old_and_new) ... ok
+test_write_failure_preserves_snapshot_and_checkpoint (test_incremental.IncrementalTests.test_write_failure_preserves_snapshot_and_checkpoint) ... ok
 test_bad_contract_rejects_entire_batch (test_pipeline.PipelineTests.test_bad_contract_rejects_entire_batch) ... ok
 test_conflicting_revision_rolls_back_prior_insert (test_pipeline.PipelineTests.test_conflicting_revision_rolls_back_prior_insert) ... ok
 test_correction_moving_week_removes_old_week (test_pipeline.PipelineTests.test_correction_moving_week_removes_old_week) ... ok
@@ -19,6 +24,6 @@ test_same_source_cannot_claim_identity_twice (test_pipeline.PipelineTests.test_s
 test_source_priority_collapses_only_explicit_shared_identity (test_pipeline.PipelineTests.test_source_priority_collapses_only_explicit_shared_identity) ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.013s
+Ran 24 tests in 0.017s
 
 OK

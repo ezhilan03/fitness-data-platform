@@ -26,3 +26,7 @@ Airflow must execute a real interval, retry and backfill. Demonstrate stale-sour
 ## Deferred
 
 HealthKit/native app integration, authenticated summary API, strength-set grain, goal history, dashboards and evaluated plan explanations follow the reliable data slice. No clinical outcomes, recommendation quality or model-comparison claims.
+
+## Incremental SQL milestone — completed locally
+
+The SQLite mart now replaces affected user/week/activity groups and tracks the last successful cutoff with a session snapshot. Twenty-four tests pass, including full-refresh equivalence, unchanged replay, source-priority changes, correction across week boundaries, erasure, backward-cutoff rejection and atomic failure/recovery. The synthetic demonstration rebuilds two groups initially, one after corrections/late arrival and zero on unchanged replay. Actual dbt installation was retried and remains blocked by restricted package-network access. Airflow is still pending.

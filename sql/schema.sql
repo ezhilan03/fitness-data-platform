@@ -19,3 +19,6 @@ CREATE TABLE IF NOT EXISTS weekly_summaries (
  distance_observed_sessions INTEGER NOT NULL, as_of TEXT NOT NULL,
  PRIMARY KEY(user_id,week_start,activity)
 );
+CREATE TABLE IF NOT EXISTS incremental_state (
+ singleton INTEGER PRIMARY KEY CHECK(singleton=1), as_of TEXT NOT NULL
+);

@@ -32,11 +32,11 @@ env = dict(os.environ, PATH=str(ROOT/'.venv-airflow/bin')+os.pathsep+os.environ[
 subprocess.run([str(ROOT/'.venv/bin/python'), '-c',
     "import json; from fitness.pipeline import connect,ingest,ROOT; "
     "c=connect("+repr(str(STATE/'source.db'))+"); "
-    "ingest(c,[json.loads(x) for x in (ROOT/'fixtures/baseline.jsonl').read_text().splitlines()],received_at='2026-09-08T12:00:00Z');c.close()"], cwd=ROOT, check=True)
+    "c.close()"], cwd=ROOT, check=True)
 for day in range(8, 15):
     path = STATE/'heartbeats'/f'202609{day:02d}T000000Z.json'
     path.write_text(json.dumps({} if day == 8 else {'watch':f'2026-09-{day:02d}T00:00:00Z'}))
-    (STATE/'exports'/path.name).write_text(json.dumps({'completed_at':f'2026-09-{day:02d}T00:00:00Z','sources':[] if day==8 else ['watch'],'records':[]}))
+    (STATE/'exports'/path.name).write_text(json.dumps({'completed_at':f'2026-09-{day:02d}T00:00:00Z','sources':[] if day==8 else ['watch','phone'],'records':[json.loads(x) for x in (ROOT/'fixtures/baseline.jsonl').read_text().splitlines()] if day==9 else []}))
 log = (STATE/'standalone.log').open('w')
 process = subprocess.Popen([str(AIRFLOW), 'standalone'], cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
 report = {'synthetic_only':True, 'airflow_version':'3.1.8', 'scheduler_executed':True}
@@ -70,6 +70,9 @@ try:
     scheduled=wait_for(lambda: (rows if len(rows)==7 and all(r['state']=='success' for r in rows) else None)
         if (rows:=query("select run_id,state,data_interval_start,data_interval_end from dag_run where dag_id='fitness_daily' and run_type='scheduled'")) else None, seconds=420)
     report['scheduled_intervals']=scheduled
+    ingested=query("select run_id from task_instance where dag_id='fitness_daily' and task_id='ingest_interval' and state='success'")
+    assert len(ingested)==7
+    report['scheduled_ingestion_tasks']=len(ingested)
     report['recovered_task']=query("select run_id,state,try_number from task_instance where dag_id='fitness_daily' and try_number>1")
     before=json.loads((STATE/'published/latest.json').read_text())
     cli('backfill','create','--dag-id','fitness_daily','--from-date','2026-09-08','--to-date','2026-09-09','--reprocess-behavior','completed','--max-active-runs','1')

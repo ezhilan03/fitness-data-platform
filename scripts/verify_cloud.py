@@ -1,5 +1,6 @@
 """Real AWS smoke, IAM authorization, idempotency, alert transport and restore."""
 import json
+import os
 from pathlib import Path
 import time
 import subprocess
@@ -16,7 +17,7 @@ s3=session.client('s3');sqs=session.client('sqs')
 name='fitness-data-platform';bucket='fitness-data-platform-'+session.client('sts').get_caller_identity()['Account']
 url=client.get_function_url_config(FunctionName=name)['FunctionUrl']
 queue=sqs.get_queue_url(QueueName=name+'-alerts')['QueueUrl']
-outputs=json.loads(subprocess.check_output(['terraform','-chdir='+str(ROOT/'infra/aws'),'output','-json'],text=True))
+outputs=json.loads(subprocess.check_output(['terraform','-chdir='+str(ROOT/'infra/aws'),'output','-json'],text=True,env=dict(os.environ,AWS_PROFILE='portfolio')))
 ecs=session.client('ecs')
 report={'batch_runtime':'ECS Fargate','synthetic_only':True,'function_url':url,'auth_type':'AWS_IAM','runs':[]}
 def invoke(fail=False):
@@ -47,8 +48,11 @@ before=s3.get_object(Bucket=bucket,Key='published/latest.json')['Body'].read()
 invoke(True)
 assert s3.get_object(Bucket=bucket,Key='published/latest.json')['Body'].read()==before
 report['failure_preserved_publication']=True
-messages=sqs.receive_message(QueueUrl=queue,WaitTimeSeconds=10,MaxNumberOfMessages=10).get('Messages',[])
-matching=[m for m in messages if json.loads(m['Body']).get('error_type')=='StaleSource']
+matching=[]
+for _ in range(6):
+    messages=sqs.receive_message(QueueUrl=queue,WaitTimeSeconds=10,MaxNumberOfMessages=10).get('Messages',[])
+    matching.extend(m for m in messages if json.loads(m['Body']).get('error_type')=='StaleSource')
+    if matching: break
 assert matching,'No stale-source alert delivered to SQS'
 report['external_alert_transport']='SQS'
 report['verified_alerts']=len(matching)

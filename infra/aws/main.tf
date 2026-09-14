@@ -98,7 +98,7 @@ resource "aws_lambda_function_url" "app" {
 }
 resource "aws_iam_role" "github" {
   name               = "${local.name}-github"
-  assume_role_policy = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com" }, Action = "sts:AssumeRoleWithWebIdentity", Condition = { StringEquals = { "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com", "token.actions.githubusercontent.com:sub" = "repo:ezhilan03/fitness-data-platform:ref:refs/heads/main" } } }] })
+  assume_role_policy = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com" }, Action = "sts:AssumeRoleWithWebIdentity", Condition = { StringEquals = { "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com", "token.actions.githubusercontent.com:sub" = "repo:ezhilan03@52958983/fitness-data-platform@1369384193:ref:refs/heads/main" } } }] })
 }
 resource "aws_iam_role_policy" "github" {
   role = aws_iam_role.github.id

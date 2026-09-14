@@ -26,6 +26,6 @@ test_same_source_cannot_claim_identity_twice (test_pipeline.PipelineTests.test_s
 test_source_priority_collapses_only_explicit_shared_identity (test_pipeline.PipelineTests.test_source_priority_collapses_only_explicit_shared_identity) ... ok
 
 ----------------------------------------------------------------------
-Ran 26 tests in 0.025s
+Ran 26 tests in 0.022s
 
 OK

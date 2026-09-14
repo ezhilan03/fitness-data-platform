@@ -1,12 +1,14 @@
-"""Airflow 3 DAG definition; runtime verification pending package access."""
+"""Airflow 3 daily transformation over completed upstream export intervals."""
 from datetime import timedelta
 import os
 from pathlib import Path
 import subprocess
 import pendulum
 from airflow.sdk import DAG, task, get_current_context
+from airflow.timetables.interval import CronDataIntervalTimetable
 
-with DAG('fitness_daily', schedule='@daily', start_date=pendulum.datetime(2026, 9, 7, tz='UTC'),
+with DAG('fitness_daily', schedule=CronDataIntervalTimetable('@daily', timezone='UTC'), start_date=pendulum.datetime(2026, 9, 7, tz='UTC'),
+         end_date=pendulum.parse(os.environ['FITNESS_SCHEDULE_END']) if os.environ.get('FITNESS_SCHEDULE_END') else None,
          catchup=True, max_active_runs=1, default_args={'retries': 2, 'retry_delay': timedelta(minutes=1)}) as dag:
     @task(execution_timeout=timedelta(minutes=20))
     def transform_interval():

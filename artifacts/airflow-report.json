@@ -1,0 +1,85 @@
+{
+  "synthetic_only": true,
+  "airflow_version": "3.1.8",
+  "scheduler_executed": true,
+  "observed_retry": [
+    {
+      "run_id": "scheduled__2026-09-07T00:00:00+00:00",
+      "task_id": "transform_interval",
+      "state": "up_for_retry",
+      "try_number": 1
+    }
+  ],
+  "retry_cause": "StaleSource",
+  "scheduled_intervals": [
+    {
+      "run_id": "scheduled__2026-09-07T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-07 00:00:00.000000",
+      "data_interval_end": "2026-09-08 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-08T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-08 00:00:00.000000",
+      "data_interval_end": "2026-09-09 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-09T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-09 00:00:00.000000",
+      "data_interval_end": "2026-09-10 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-10T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-10 00:00:00.000000",
+      "data_interval_end": "2026-09-11 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-11T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-11 00:00:00.000000",
+      "data_interval_end": "2026-09-12 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-12T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-12 00:00:00.000000",
+      "data_interval_end": "2026-09-13 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-13T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-13 00:00:00.000000",
+      "data_interval_end": "2026-09-14 00:00:00.000000"
+    }
+  ],
+  "recovered_task": [
+    {
+      "run_id": "scheduled__2026-09-07T00:00:00+00:00",
+      "state": "success",
+      "try_number": 2
+    }
+  ],
+  "backfill_intervals": [
+    {
+      "run_id": "scheduled__2026-09-08T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-08 00:00:00.000000",
+      "data_interval_end": "2026-09-09 00:00:00.000000"
+    },
+    {
+      "run_id": "scheduled__2026-09-09T00:00:00+00:00",
+      "state": "success",
+      "data_interval_start": "2026-09-09 00:00:00.000000",
+      "data_interval_end": "2026-09-10 00:00:00.000000"
+    }
+  ],
+  "backfill_preserved_latest": true,
+  "local_alerts": 1,
+  "passed": true,
+  "verified_dbt_builds": 9,
+  "dbt_tests_per_build": 13,
+  "local_server_stopped": true
+}

@@ -62,13 +62,13 @@ Three actual dbt models and 13 data tests pass in each of eight synthetic scenar
 
 ## Interval operations
 
-The local interval runner adds export-heartbeat freshness checks, isolated dbt runs and a latest-successful-publication pointer. See [operations design and verification limits](docs/OPERATIONS.md). Run `.venv/bin/python -m fitness.operations_demo` for actual dbt failure-gate/recovery evidence. Airflow installation is currently blocked by package-network restrictions; its DAG is prepared but unverified.
+The local interval runner adds export-heartbeat freshness checks, isolated dbt runs and a latest-successful-publication pointer. See [operations design and verification limits](docs/OPERATIONS.md). Run `.venv/bin/python -m fitness.operations_demo` for actual dbt failure-gate/recovery evidence. Airflow 3.1.8 now runs the actual DAG: seven scheduled intervals and two backfills passed, including recovery on a second task attempt after a stale-source failure. [Scheduler evidence](artifacts/airflow-report.json) and [reproduction details](docs/AIRFLOW-VERIFICATION.md).
 
 ## Next gates
 
-1. Run Airflow interval/retry/backfill and freshness-alert exercises.
+1. Verify external freshness-alert delivery and automate upstream export ingestion.
 2. Verify Docker and hosted CI, then authenticated summary delivery and budgeted cloud operations.
 
-Airflow remains pending. No cloud resources were created. CI includes the dbt regression but has not run on GitHub. The Docker definition currently covers the standard-library baseline and remains unverified locally.
+Airflow is verified locally with a single active run and SQLite metadata. No cloud resources were created. CI includes the dbt regression but has not run on GitHub. The Docker definition currently covers the standard-library baseline and remains unverified locally.
 
 For the incremental command, use `python3 -m fitness --database fitness.db summarize --as-of 2030-01-01T00:00:00Z --incremental`. Local deletion also removes the subject from the incremental snapshot. Snapshot, aggregates and watermark roll back together on failure.

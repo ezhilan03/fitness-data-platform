@@ -6,8 +6,8 @@ Freshness measures completed exports, including empty exports, rather than last 
 
 Run `.venv/bin/python -m fitness.operations_demo` to exercise two actual dbt builds around a stale-source failure. The report records freshness failure, local alert creation, preserved publication and successful recovery. Unit tests additionally inject a transform failure and check historical-publication behavior; these are not Airflow scheduler tests. Run outputs in the demo are temporary synthetic artifacts.
 
-`dags/fitness_daily.py` prepares an Airflow 3 daily schedule, two retries, catchup and one active run. It runs dbt in its separate environment to avoid dependency conflicts. Configure FITNESS_PROJECT_ROOT and FITNESS_STATE_ROOT; source.db and per-interval heartbeats must exist under the latter. FITNESS_REQUIRED_SOURCES defaults to watch,phone,manual.
+`dags/fitness_daily.py` uses an explicit UTC daily data-interval timetable, two retries, catchup and one active run. It runs dbt in its separate environment to avoid dependency conflicts. Configure FITNESS_PROJECT_ROOT and FITNESS_STATE_ROOT; source.db and per-interval heartbeats must exist under the latter. FITNESS_REQUIRED_SOURCES defaults to watch,phone,manual.
 
-Airflow 3.1.8 installation with the official Python 3.11 constraints was attempted but blocked by DNS/network restrictions. The DAG has not been imported or executed by Airflow. Scheduled intervals, actual scheduler retries/backfills and external alert delivery remain unverified. No cloud resources were created.
+The package-network blocker was resolved. Airflow 3.1.8 was installed with official Python 3.11 constraints and executed seven scheduled intervals and two backfills. A deliberate stale heartbeat caused up_for_retry; restoration allowed the second task attempt to succeed. Historical backfills preserved latest.json. See AIRFLOW-VERIFICATION.md and artifacts/airflow-report.json. External alert delivery remains unverified. No cloud resources were created.
 
 Official constrained-install reference: https://github.com/apache/airflow/blob/main/INSTALLING.md

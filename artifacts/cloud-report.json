@@ -1,0 +1,71 @@
+{
+  "batch_runtime": "ECS Fargate",
+  "synthetic_only": true,
+  "function_url": "https://ho3y6ccc5z5ogtv4b6jzdxlila0taxxc.lambda-url.us-east-1.on.aws/",
+  "auth_type": "AWS_IAM",
+  "runs": [
+    {
+      "task_arn": "arn:aws:ecs:us-east-1:943088191195:task/fitness-data-platform/101aa5299d63458fb132b30c1ae4a593",
+      "status": "success",
+      "run_id": "a0b243f6dc6a486086ae88bac33f403d",
+      "ingestion": [
+        {
+          "inserted": 0,
+          "replayed": 3
+        },
+        {
+          "inserted": 0,
+          "replayed": 2
+        }
+      ],
+      "models": 3,
+      "tests_passed": 13
+    },
+    {
+      "task_arn": "arn:aws:ecs:us-east-1:943088191195:task/fitness-data-platform/7c5d80bdd80241f98d23d02019e2ae31",
+      "status": "success",
+      "run_id": "741f5c4d482149bb9cd0e145c735bd03",
+      "ingestion": [
+        {
+          "inserted": 0,
+          "replayed": 3
+        },
+        {
+          "inserted": 0,
+          "replayed": 2
+        }
+      ],
+      "models": 3,
+      "tests_passed": 13
+    },
+    {
+      "task_arn": "arn:aws:ecs:us-east-1:943088191195:task/fitness-data-platform/c62342060e424cbda9ba1f88084b6c5d",
+      "status": "success",
+      "run_id": "20ee1ff3f1144a11b46508f61a1927da",
+      "ingestion": [
+        {
+          "inserted": 0,
+          "replayed": 3
+        },
+        {
+          "inserted": 0,
+          "replayed": 2
+        }
+      ],
+      "models": 3,
+      "tests_passed": 13
+    }
+  ],
+  "replay_no_new_revisions": true,
+  "failed_task_arn": "arn:aws:ecs:us-east-1:943088191195:task/fitness-data-platform/48dbe4fc2c0646c58b68b81f0fe90cec",
+  "failure_preserved_publication": true,
+  "external_alert_transport": "SQS",
+  "verified_alerts": 1,
+  "versioned_source_restore": true,
+  "unsigned_http_status": 403,
+  "signed_http_status": 200,
+  "running_distance_m": 8000,
+  "daily_sessions": 3,
+  "passed": true,
+  "image_uri": "943088191195.dkr.ecr.us-east-1.amazonaws.com/fitness-data-platform@sha256:156dc13539e96d2bd31361bf26f44eff643b723a6de9b979ca4d16b019e8090f"
+}

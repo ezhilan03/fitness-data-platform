@@ -1,5 +1,13 @@
 name: Fitness data contracts
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    paths-ignore: [README.md, docs/**, artifacts/**, site/**, RELEASE-PLAN.md]
+  pull_request:
+    paths-ignore: [README.md, docs/**, artifacts/**, site/**, RELEASE-PLAN.md]
+  workflow_dispatch:
+concurrency:
+  group: fitness-verification-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -14,6 +22,14 @@ jobs:
       - run: |
           python -m venv .venv
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.1'
+          terraform_wrapper: false
+      - run: |
+          terraform -chdir=infra/aws fmt -check
+          terraform -chdir=infra/aws init -backend=false
+          terraform -chdir=infra/aws validate
       - run: python -m unittest discover -s tests -v
       - run: python -m fitness.demo > demo-report.json
       - run: python -m fitness.incremental_demo > incremental-report.json

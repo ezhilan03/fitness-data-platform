@@ -1,0 +1,61 @@
+name: Deploy verified Fitness release
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Fitness data contracts]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: fitness-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: vars.AWS_ROLE_ARN != '' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Require successful CI for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA=$(git rev-parse HEAD)
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/runs?head_sha=$SHA&status=success" --jq '.workflow_runs | length' > matching-runs.txt
+          test "$(cat matching-runs.txt)" -gt 0
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and test release image
+        run: |
+          docker build --platform linux/amd64 --provenance=false --target cloud -t fitness-cloud .
+          docker run --rm --read-only --user 1000:1000 --tmpfs /tmp:rw,size=512m -e HOME=/tmp -e PYTHONPATH=/var/task --entrypoint python -v "$PWD/scripts/container_smoke.py:/verify.py:ro" fitness-cloud /verify.py > container-report.json
+      - name: Publish and deploy
+        env:
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        run: |
+          IMAGE="$ECR_REPOSITORY:$(git rev-parse HEAD)-$GITHUB_RUN_NUMBER"
+          docker tag fitness-cloud "$IMAGE"
+          docker push "$IMAGE"
+          aws lambda update-function-code --function-name fitness-data-platform --image-uri "$IMAGE" > deployment.json
+          aws lambda wait function-updated-v2 --function-name fitness-data-platform
+          aws lambda invoke --function-name fitness-data-platform --cli-binary-format raw-in-base64-out --payload '{"operation":"run"}' invocation.json > invoke-metadata.json
+          python - <<'PY'
+          import json
+          r=json.load(open('invocation.json'))
+          assert r['status']=='success' and r['tests_passed']==13,r
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fitness-deployment
+          path: |
+            container-report.json
+            invocation.json
+            invoke-metadata.json

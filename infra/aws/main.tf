@@ -69,6 +69,7 @@ resource "aws_iam_role" "runtime" {
 resource "aws_iam_role_policy" "runtime" {
   role = aws_iam_role.runtime.id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
+    { Effect = "Allow", Action = ["s3:ListBucket"], Resource = aws_s3_bucket.state.arn },
     { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"], Resource = "${aws_s3_bucket.state.arn}/*" },
     { Effect = "Allow", Action = ["s3:DeleteObject"], Resource = "${aws_s3_bucket.state.arn}/state/run.lock" },
     { Effect = "Allow", Action = ["sqs:SendMessage"], Resource = aws_sqs_queue.alerts.arn },
@@ -81,6 +82,7 @@ resource "aws_lambda_function" "app" {
   package_type  = "Image"
   image_uri     = var.image_uri
   role          = aws_iam_role.runtime.arn
+  lifecycle { ignore_changes = [image_uri] }
   architectures = ["x86_64"]
   timeout       = 300
   memory_size   = 1536

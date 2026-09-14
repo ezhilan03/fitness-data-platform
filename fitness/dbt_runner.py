@@ -38,9 +38,10 @@ def build(destination, as_of, output, *, full_refresh=False, docs=False):
     command=[str(executable),'build','--project-dir',str(ROOT/'dbt'),'--profiles-dir',str(ROOT/'dbt'),
              '--vars',json.dumps({'as_of':cutoff})]
     if full_refresh:command.append('--full-refresh')
-    result=subprocess.run(command,env=env,text=True,capture_output=True)
+    result=subprocess.run(command,env=env,text=True,capture_output=True,timeout=240)
     (output/'build.log').write_text(result.stdout+result.stderr)
     if result.returncode:
+        print(json.dumps({'event':'dbt_build_failed','output':(result.stdout+result.stderr)[-10000:]}))
         raise RuntimeError('dbt build failed; see '+str(output/'build.log'))
     results=json.loads((output/'target/run_results.json').read_text())
     statuses=[r['status'] for r in results['results']]
@@ -48,7 +49,7 @@ def build(destination, as_of, output, *, full_refresh=False, docs=False):
     if docs:
         command[1:2]=['docs','generate']
         command=[c for c in command if c!='--full-refresh']
-        doc_result=subprocess.run(command,env=env,text=True,capture_output=True)
+        doc_result=subprocess.run(command,env=env,text=True,capture_output=True,timeout=240)
         (output/'docs.log').write_text(doc_result.stdout+doc_result.stderr)
         if doc_result.returncode:raise RuntimeError('dbt documentation generation failed')
     with duckdb.connect(str(destination),read_only=True) as db:

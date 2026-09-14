@@ -67,6 +67,8 @@ def handler(event, context):
             pointer=json.loads((root/'published/latest.json').read_text())
             summary=json.loads((Path(pointer['run_dir'])/'summary.json').read_text())
             summary['run_id']=run_id
+            summary['ingestion']=counts
+            summary['build']={'models':report['models'],'tests_passed':report['tests_passed']}
             s3.put_object(Bucket=bucket,Key=f'published/runs/{run_id}.json',Body=json.dumps(summary),ContentType='application/json')
             try: previous=json.loads(s3.get_object(Bucket=bucket,Key='published/latest.json')['Body'].read())
             except ClientError as error:

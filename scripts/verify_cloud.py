@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import time
+import subprocess
 from urllib.request import Request,urlopen
 from urllib.error import HTTPError
 import boto3
@@ -15,15 +16,29 @@ s3=session.client('s3');sqs=session.client('sqs')
 name='fitness-data-platform';bucket='fitness-data-platform-'+session.client('sts').get_caller_identity()['Account']
 url=client.get_function_url_config(FunctionName=name)['FunctionUrl']
 queue=sqs.get_queue_url(QueueName=name+'-alerts')['QueueUrl']
-report={'synthetic_only':True,'function_url':url,'auth_type':'AWS_IAM','runs':[]}
+outputs=json.loads(subprocess.check_output(['terraform','-chdir='+str(ROOT/'infra/aws'),'output','-json'],text=True))
+ecs=session.client('ecs')
+report={'batch_runtime':'ECS Fargate','synthetic_only':True,'function_url':url,'auth_type':'AWS_IAM','runs':[]}
 def invoke(fail=False):
-    r=client.invoke(FunctionName=name,Payload=json.dumps({'operation':'run','inject_stale':fail}).encode())
-    data=json.loads(r['Payload'].read())
+    task=ecs.run_task(cluster='fitness-data-platform',taskDefinition=ecs.describe_task_definition(taskDefinition='fitness-data-platform')['taskDefinition']['taskDefinitionArn'],launchType='FARGATE',
+        networkConfiguration={'awsvpcConfiguration':{'subnets':[outputs['batch_subnet']['value']],'securityGroups':[outputs['batch_security_group']['value']],'assignPublicIp':'ENABLED'}},
+        overrides={'containerOverrides':[{'name':'batch','environment':[{'name':'FITNESS_BATCH_EVENT','value':json.dumps({'operation':'run','inject_stale':fail})}]}]})
+    assert not task.get('failures'),task.get('failures')
+    arn=task['tasks'][0]['taskArn']
+    try: ecs.get_waiter('tasks_stopped').wait(cluster='fitness-data-platform',tasks=[arn],WaiterConfig={'Delay':5,'MaxAttempts':120})
+    except Exception:
+        ecs.stop_task(cluster='fitness-data-platform',task=arn,reason='Verification timeout cost guard');raise
+    stopped=ecs.describe_tasks(cluster='fitness-data-platform',tasks=[arn])['tasks'][0]
+    exit_code=stopped['containers'][0].get('exitCode')
     if fail:
-        assert r.get('FunctionError') and data['errorType']=='StaleSource',data
-    else:
-        assert not r.get('FunctionError') and data['status']=='success' and data['tests_passed']==13,data
-        report['runs'].append(data)
+        assert exit_code==1,stopped
+        report['failed_task_arn']=arn
+        return
+    assert exit_code==0,stopped
+    summary=json.loads(s3.get_object(Bucket=bucket,Key='published/latest.json')['Body'].read())
+    data={'task_arn':arn,'status':'success','run_id':summary['run_id'],'ingestion':summary['ingestion'],**summary['build']}
+    assert data['tests_passed']==13,data
+    report['runs'].append(data)
     return data
 first=invoke();second=invoke()
 assert all(item['inserted']==0 for item in second['ingestion'])

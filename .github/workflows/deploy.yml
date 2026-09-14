@@ -40,22 +40,18 @@ jobs:
       - name: Publish and deploy
         env:
           ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          BATCH_SUBNET: ${{ vars.BATCH_SUBNET }}
+          BATCH_SECURITY_GROUP: ${{ vars.BATCH_SECURITY_GROUP }}
+          FITNESS_BUCKET: ${{ vars.FITNESS_BUCKET }}
         run: |
           IMAGE="$ECR_REPOSITORY:$(git rev-parse HEAD)-$GITHUB_RUN_NUMBER"
           docker tag fitness-cloud "$IMAGE"
           docker push "$IMAGE"
-          aws lambda update-function-code --function-name fitness-data-platform --image-uri "$IMAGE" > deployment.json
-          aws lambda wait function-updated-v2 --function-name fitness-data-platform
-          aws lambda invoke --function-name fitness-data-platform --cli-binary-format raw-in-base64-out --payload '{"operation":"run"}' invocation.json > invoke-metadata.json
-          python - <<'PY'
-          import json
-          r=json.load(open('invocation.json'))
-          assert r['status']=='success' and r['tests_passed']==13,r
-          PY
+          python -m pip install -r requirements-cloud-tools.txt
+          python scripts/deploy_cloud.py --image "$IMAGE"
       - uses: actions/upload-artifact@v4
         with:
           name: fitness-deployment
           path: |
             container-report.json
-            invocation.json
-            invoke-metadata.json
+            deployment-report.json

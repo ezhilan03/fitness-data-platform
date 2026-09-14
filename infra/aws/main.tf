@@ -177,6 +177,7 @@ resource "aws_iam_role_policy" "github_batch" {
   role = aws_iam_role.github.id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Action = ["ecs:DescribeTaskDefinition", "ecs:RegisterTaskDefinition", "ecs:DescribeTasks"], Resource = "*" },
+    { Effect = "Allow", Action = ["ecs:StopTask"], Resource = "arn:aws:ecs:us-east-1:${data.aws_caller_identity.current.account_id}:task/${local.name}/*" },
     { Effect = "Allow", Action = ["ecs:RunTask"], Resource = "arn:aws:ecs:us-east-1:${data.aws_caller_identity.current.account_id}:task-definition/${local.name}:*", Condition = { ArnEquals = { "ecs:cluster" = aws_ecs_cluster.batch.arn } } },
     { Effect = "Allow", Action = ["iam:PassRole"], Resource = [aws_iam_role.runtime.arn, aws_iam_role.execution.arn], Condition = { StringEquals = { "iam:PassedToService" = "ecs-tasks.amazonaws.com" } } },
     { Effect = "Allow", Action = ["s3:GetObject"], Resource = "${aws_s3_bucket.state.arn}/published/latest.json" }

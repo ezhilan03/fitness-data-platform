@@ -16,6 +16,6 @@ Install `requirements-cloud-tools.txt` alongside the local dbt environment and a
 
 The deployment workflow publishes an immutable image, registers a new Fargate task definition, updates the read-only Lambda image and runs a smoke batch. Rollback uses an earlier retained image/task-definition revision. Terraform does not silently undo an image deployment. The first infrastructure bootstrap creates the storage/image repository before the image-dependent resources; subsequent init uses the existing S3 backend.
 
-A failed batch leaves the latest published summary intact. Inspect CloudWatch structured events (`fitness_run_failed`, `dbt_build_failed`) and the SQS alert. Restore the source's prior S3 version if needed, then rerun. Expired leases can be replaced with an ETag-conditional write; an active lease returns busy. Do not delete someone else's active lock or bypass the concurrency guard.
+Stale-source and dbt failures leave the latest published summary intact. Inspect CloudWatch structured events (`fitness_run_failed`, `dbt_build_failed`) and the SQS alert. Restore the source's prior S3 version if needed, then rerun. Expired leases can be replaced with an ETag-conditional write; an active lease returns busy. Do not delete someone else's active lock or bypass the concurrency guard.
 
 Only synthetic fixtures are authorized for this release. Logical deletion in the ingestion database does not sanitize every retained S3 version, local export or public snapshot. Real health data requires a separate retention/subject-erasure design before ingestion.

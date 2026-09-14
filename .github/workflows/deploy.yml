@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    if: vars.AWS_ROLE_ARN != '' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    if: vars.AWS_ROLE_ARN != '' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           SHA=$(git rev-parse HEAD)
-          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/runs?head_sha=$SHA&status=success" --jq '.workflow_runs | length' > matching-runs.txt
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/runs?head_sha=$SHA&status=success&event=push" --jq '.workflow_runs | length' > matching-runs.txt
           test "$(cat matching-runs.txt)" -gt 0
       - uses: aws-actions/configure-aws-credentials@v4
         with:

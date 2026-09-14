@@ -8,6 +8,6 @@ Each actual dbt build runs three models and 13 tests, including source/model non
 
 This implementation copies all source rows and scans all current sessions. Only changed target groups are selected for incremental replacement; no throughput or read-pruning claim is made. The whole dbt DAG is not published as one atomic snapshot, and dbt failure/retry recovery has not yet been injected. SQLite atomic rollback tests do not establish dbt atomicity. Erasure propagation is verified in the live source and derived tables; disk sanitization and exported backup retention remain out of scope.
 
-CI is configured to repeat this regression, but hosted execution is pending. Docker currently covers the standard-library baseline. Airflow scheduling, retries, backfills, freshness alerting and cloud deployment are separate gates.
+Hosted CI repeats this regression. Separate Docker targets cover the standard-library baseline and cloud dbt runtime. Airflow scheduling/retry/backfill and AWS Fargate execution are verified separately; see the current README and release artifacts.
 
 Adapter reference: https://github.com/duckdb/dbt-duckdb

@@ -1,6 +1,7 @@
 """Real AWS smoke, IAM authorization, idempotency, alert transport and restore."""
 import json
 import os
+import sys
 from pathlib import Path
 import time
 import subprocess
@@ -11,6 +12,7 @@ from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
 from botocore.config import Config
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 session=boto3.Session(profile_name='portfolio',region_name='us-east-1')
 client=session.client('lambda',config=Config(read_timeout=360))
 s3=session.client('s3');sqs=session.client('sqs')

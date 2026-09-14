@@ -28,6 +28,6 @@ test_export_replay_empty_completion_and_failed_contract (test_release.ReleaseTes
 test_http_auth_fail_closed_and_published_response (test_release.ReleaseTests.test_http_auth_fail_closed_and_published_response) ... ok
 
 ----------------------------------------------------------------------
-Ran 28 tests in 0.544s
+Ran 28 tests in 0.535s
 
 OK

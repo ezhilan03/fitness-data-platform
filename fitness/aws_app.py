@@ -28,7 +28,7 @@ def handler(event, context):
             raise
         if path=='/': return response(200,render(summary),html=True)
         return response(200,summary if path=='/summary' else {'status':'ready','as_of':summary['as_of'],'synthetic_only':True})
-    if event.get('operation')!='run': return response(400,{'error':'unsupported_operation'})
+    if os.environ.get('FITNESS_EXECUTION_MODE')!='batch' or event.get('operation')!='run': return response(400,{'error':'unsupported_operation'})
     # Public HTTP requests cannot execute jobs; direct Lambda invocation requires IAM.
     cutoff=utc(event.get('as_of','2026-09-15T12:00:00Z'))
     if cutoff<'2026-09-15T12:00:00Z': return response(400,{'error':'demo_cutoff_precedes_fixture_receipts'})

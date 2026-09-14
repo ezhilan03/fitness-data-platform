@@ -55,5 +55,8 @@ def build(destination, as_of, output, *, full_refresh=False, docs=False):
         cursor=db.execute('SELECT * FROM analytics.weekly_summaries ORDER BY user_id,week_start,activity')
         names=[c[0] for c in cursor.description]
         rows=[dict(zip(names,row),as_of=cutoff) for row in cursor.fetchall()]
-    return {'cutoff':cutoff,'models':sum(s=='success' for s in statuses),
+        daily_cursor=db.execute('SELECT user_id,local_date,activity,count(*) AS sessions,sum(duration_seconds) AS duration_seconds,sum(distance_m) AS distance_m,count(distance_m) AS distance_observed_sessions FROM analytics.current_sessions GROUP BY user_id,local_date,activity ORDER BY user_id,local_date,activity')
+        daily_names=[c[0] for c in daily_cursor.description]
+        daily=[dict(zip(daily_names,row)) for row in daily_cursor.fetchall()]
+    return {'days':daily,'cutoff':cutoff,'models':sum(s=='success' for s in statuses),
             'tests_passed':sum(s=='pass' for s in statuses),'weeks':rows}

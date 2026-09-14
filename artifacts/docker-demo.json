@@ -1,0 +1,76 @@
+{
+  "synthetic_only": true,
+  "first_ingestion": {
+    "inserted": 3,
+    "replayed": 0
+  },
+  "replay": {
+    "inserted": 0,
+    "replayed": 3
+  },
+  "historical_summary_unchanged": true,
+  "initial": {
+    "as_of": "2026-09-08T12:00:00Z",
+    "coverage": "observed sessions only; missing days are unknown",
+    "overlapping_session_pairs": 1,
+    "weeks": [
+      {
+        "user_id": "synthetic-alex",
+        "week_start": "2026-09-07",
+        "activity": "run",
+        "sessions": 1,
+        "observed_days": 1,
+        "duration_seconds": 1800,
+        "distance_m": 5000.0,
+        "distance_observed_sessions": 1,
+        "as_of": "2026-09-08T12:00:00Z"
+      },
+      {
+        "user_id": "synthetic-alex",
+        "week_start": "2026-09-07",
+        "activity": "strength",
+        "sessions": 1,
+        "observed_days": 1,
+        "duration_seconds": 1800,
+        "distance_m": null,
+        "distance_observed_sessions": 0,
+        "as_of": "2026-09-08T12:00:00Z"
+      }
+    ]
+  },
+  "after_correction_and_late_arrival": {
+    "as_of": "2026-09-15T12:00:00Z",
+    "coverage": "observed sessions only; missing days are unknown",
+    "overlapping_session_pairs": 1,
+    "weeks": [
+      {
+        "user_id": "synthetic-alex",
+        "week_start": "2026-09-07",
+        "activity": "run",
+        "sessions": 2,
+        "observed_days": 2,
+        "duration_seconds": 3000,
+        "distance_m": 8000.0,
+        "distance_observed_sessions": 2,
+        "as_of": "2026-09-15T12:00:00Z"
+      },
+      {
+        "user_id": "synthetic-alex",
+        "week_start": "2026-09-07",
+        "activity": "strength",
+        "sessions": 1,
+        "observed_days": 1,
+        "duration_seconds": 1800,
+        "distance_m": null,
+        "distance_observed_sessions": 0,
+        "as_of": "2026-09-15T12:00:00Z"
+      }
+    ]
+  },
+  "erasure": {
+    "removed_revisions": 5,
+    "scope": "logical deletion from local tables; external exports/backups not covered"
+  },
+  "erased_replay_blocked": true,
+  "passed": true
+}

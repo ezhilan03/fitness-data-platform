@@ -24,10 +24,8 @@ test_older_revision_arriving_last_does_not_downgrade (test_pipeline.PipelineTest
 test_same_export_is_noop (test_pipeline.PipelineTests.test_same_export_is_noop) ... ok
 test_same_source_cannot_claim_identity_twice (test_pipeline.PipelineTests.test_same_source_cannot_claim_identity_twice) ... ok
 test_source_priority_collapses_only_explicit_shared_identity (test_pipeline.PipelineTests.test_source_priority_collapses_only_explicit_shared_identity) ... ok
-test_export_replay_empty_completion_and_failed_contract (test_release.ReleaseTests.test_export_replay_empty_completion_and_failed_contract) ... ok
-test_http_auth_fail_closed_and_published_response (test_release.ReleaseTests.test_http_auth_fail_closed_and_published_response) ... ok
 
 ----------------------------------------------------------------------
-Ran 28 tests in 0.544s
+Ran 26 tests in 0.018s
 
 OK

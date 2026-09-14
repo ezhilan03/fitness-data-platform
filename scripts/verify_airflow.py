@@ -17,6 +17,7 @@ HOME = STATE/'airflow'
 AIRFLOW = ROOT/'.venv-airflow/bin/airflow'
 STATE.mkdir(parents=True, exist_ok=True)
 (STATE/'heartbeats').mkdir(exist_ok=True)
+(STATE/'exports').mkdir(exist_ok=True)
 if (HOME/'airflow.db').exists():
     raise SystemExit('Use a fresh verification directory; do not overwrite previous scheduler evidence')
 env = dict(os.environ, PATH=str(ROOT/'.venv-airflow/bin')+os.pathsep+os.environ['PATH'], AIRFLOW_HOME=str(HOME), AIRFLOW__CORE__LOAD_EXAMPLES='false',
@@ -35,6 +36,7 @@ subprocess.run([str(ROOT/'.venv/bin/python'), '-c',
 for day in range(8, 15):
     path = STATE/'heartbeats'/f'202609{day:02d}T000000Z.json'
     path.write_text(json.dumps({} if day == 8 else {'watch':f'2026-09-{day:02d}T00:00:00Z'}))
+    (STATE/'exports'/path.name).write_text(json.dumps({'completed_at':f'2026-09-{day:02d}T00:00:00Z','sources':[] if day==8 else ['watch'],'records':[]}))
 log = (STATE/'standalone.log').open('w')
 process = subprocess.Popen([str(AIRFLOW), 'standalone'], cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
 report = {'synthetic_only':True, 'airflow_version':'3.1.8', 'scheduler_executed':True}

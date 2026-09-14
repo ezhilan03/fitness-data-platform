@@ -12,3 +12,8 @@ dbt/logs/
 dbt/.user.yml
 
 .venv-airflow/
+
+.terraform/
+*.tfstate*
+*.tfplan
+*.auto.tfvars

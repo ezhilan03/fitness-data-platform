@@ -20,6 +20,8 @@ def main():
             result=build(target,cutoff,output/label,full_refresh=full,docs=docs)
             expected=refresh(source,cutoff)['weeks']
             assert result['weeks']==expected,(label,result['weeks'],expected)
+            assert sum(row['sessions'] for row in result['days'])==sum(row['sessions'] for row in expected)
+            assert sum(row['duration_seconds'] for row in result['days'])==sum(row['duration_seconds'] for row in expected)
             report['scenarios'].append({'name':label,'source_revisions':exported,'tests_passed':result['tests_passed'],
                                         'models':result['models'],'matches_sqlite_full_refresh':True,'groups':len(expected)})
         early='2026-09-08T12:00:00Z';late='2026-09-15T12:00:00Z'

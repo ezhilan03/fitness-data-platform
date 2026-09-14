@@ -51,6 +51,7 @@ def run_interval(database, heartbeat_file, output, start, end, required_sources,
             result = build(run_dir / 'fitness.duckdb', end, run_dir / 'dbt', full_refresh=True)
         else:
             result = transform(run_dir, end)
+        (run_dir/'summary.json').write_text(json.dumps({'synthetic_only':True,'as_of':end,'weeks':result.get('weeks',[]),'days':result.get('days',[]),'freshness':checks},indent=2)+'\n')
         report.update(status='success', models=result['models'], tests_passed=result['tests_passed'])
         report_file.write_text(json.dumps(report, indent=2) + '\n')
         latest = output / 'latest.json'

@@ -1,5 +1,7 @@
 .git
-.venv
+.venv*
 __pycache__
 *.db
 artifacts
+infra/**/.terraform
+infra/**/*.tfstate*

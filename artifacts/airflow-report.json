@@ -77,9 +77,8 @@
     }
   ],
   "backfill_preserved_latest": true,
-  "local_alerts": 1,
-  "passed": true,
   "verified_dbt_builds": 9,
   "dbt_tests_per_build": 13,
-  "local_server_stopped": true
+  "local_alerts": 1,
+  "passed": true
 }

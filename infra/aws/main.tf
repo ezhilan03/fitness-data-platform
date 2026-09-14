@@ -70,20 +70,20 @@ resource "aws_iam_role_policy" "runtime" {
   role = aws_iam_role.runtime.id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"], Resource = "${aws_s3_bucket.state.arn}/*" },
+    { Effect = "Allow", Action = ["s3:DeleteObject"], Resource = "${aws_s3_bucket.state.arn}/state/run.lock" },
     { Effect = "Allow", Action = ["sqs:SendMessage"], Resource = aws_sqs_queue.alerts.arn },
     { Effect = "Allow", Action = ["logs:CreateLogStream", "logs:PutLogEvents"], Resource = "${aws_cloudwatch_log_group.app.arn}:*" }
   ] })
 }
 resource "aws_lambda_function" "app" {
-  count                          = var.image_uri == "" ? 0 : 1
-  function_name                  = local.name
-  package_type                   = "Image"
-  image_uri                      = var.image_uri
-  role                           = aws_iam_role.runtime.arn
-  architectures                  = ["x86_64"]
-  timeout                        = 300
-  memory_size                    = 1536
-  reserved_concurrent_executions = 1
+  count         = var.image_uri == "" ? 0 : 1
+  function_name = local.name
+  package_type  = "Image"
+  image_uri     = var.image_uri
+  role          = aws_iam_role.runtime.arn
+  architectures = ["x86_64"]
+  timeout       = 300
+  memory_size   = 1536
   ephemeral_storage { size = 512 }
   environment { variables = { FITNESS_BUCKET = aws_s3_bucket.state.id, FITNESS_ALERT_QUEUE = aws_sqs_queue.alerts.url, DBT_SEND_ANONYMOUS_USAGE_STATS = "false", HOME = "/tmp" } }
   depends_on = [aws_iam_role_policy.runtime, aws_cloudwatch_log_group.app]

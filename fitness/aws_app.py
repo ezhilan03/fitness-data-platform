@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import tempfile
 import uuid
+import time
 import boto3
 from botocore.exceptions import ClientError
 from fitness.pipeline import ROOT, connect, ingest, utc
@@ -32,6 +33,21 @@ def handler(event, context):
     cutoff=utc(event.get('as_of','2026-09-15T12:00:00Z'))
     if cutoff<'2026-09-15T12:00:00Z': return response(400,{'error':'demo_cutoff_precedes_fixture_receipts'})
     run_id=uuid.uuid4().hex
+    lock_key='state/run.lock'
+    lock_body=json.dumps({'owner':run_id,'expires_at':time.time()+600})
+    try:
+        acquired=s3.put_object(Bucket=bucket,Key=lock_key,Body=lock_body,IfNoneMatch='*')
+    except ClientError as error:
+        if error.response['Error']['Code'] not in ('PreconditionFailed','ConditionalRequestConflict'): raise
+        try:
+            previous_lock=s3.get_object(Bucket=bucket,Key=lock_key)
+            if json.loads(previous_lock['Body'].read())['expires_at']>time.time():
+                return {'status':'busy','retryable':True}
+            acquired=s3.put_object(Bucket=bucket,Key=lock_key,Body=lock_body,IfMatch=previous_lock['ETag'])
+        except ClientError as conflict:
+            if conflict.response['Error']['Code'] in ('PreconditionFailed','ConditionalRequestConflict','NoSuchKey'):
+                return {'status':'busy','retryable':True}
+            raise
     try:
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory); database=root/'source.db'
@@ -66,3 +82,5 @@ def handler(event, context):
         boto3.client('sqs').send_message(QueueUrl=os.environ['FITNESS_ALERT_QUEUE'],MessageBody=json.dumps(alert))
         print(json.dumps(alert))
         raise
+    finally:
+        s3.delete_object(Bucket=bucket,Key=lock_key,IfMatch=acquired['ETag'])

@@ -1,0 +1,36 @@
+version: 2
+sources:
+  - name: fitness_raw
+    schema: raw
+    description: "Transactional export of validated SQLite source revisions; synthetic fixtures only in evaluation."
+    tables:
+      - name: revisions
+        description: "Grain: user, source, source event, revision. Receipt time never changes on replay."
+        columns:
+          - name: user_id
+            data_tests: [not_null]
+          - name: revision
+            data_tests: [not_null]
+          - name: received_at
+            data_tests: [not_null]
+models:
+  - name: stg_revisions
+    description: "Source versions visible at the requested knowledge cutoff."
+  - name: current_sessions
+    description: "One user/canonical-session row after source revision and explicit source-priority selection."
+    columns:
+      - name: session_id
+        data_tests: [not_null]
+      - name: duration_seconds
+        data_tests: [not_null]
+  - name: weekly_summaries
+    description: "One user/local Monday/activity group. Incremental changed-group replacement; removed groups disappear. Distance counts expose partial coverage. Cutoff is supplied by the run, not a per-row last-change timestamp."
+    columns:
+      - name: user_id
+        data_tests: [not_null]
+      - name: week_start
+        data_tests: [not_null]
+      - name: activity
+        data_tests: [not_null]
+      - name: sessions
+        data_tests: [not_null]

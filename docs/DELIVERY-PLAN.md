@@ -6,18 +6,16 @@ Scope approved 14 September 2026: start the local Fitness data-engineering slice
 |---|---|---|
 | Delivery Hero: point-in-time datasets, historization, late arrivals | Revision history and availability/receipt cutoff tests | Production event ingestion, orchestration and operational monitoring |
 | Delivery Hero: validation, observability, lineage | Input contracts, payload/source identity, overlap counts, recovery test | Freshness thresholds and actual alert delivery |
-| Prodigal: SQL models and rerunnable transformations | SQL window selection and transactional weekly mart, verified replay | Actual dbt build/tests/docs and incremental partition replacement |
-| Prodigal: dimensional modelling and historical data | Declared source/session/week grains and preserved revisions | Goal dimension history, additional health observations and dbt lineage |
+| Prodigal: SQL models and rerunnable transformations | SQL window selection and transactional weekly mart, verified replay | Airflow scheduling, dbt failure/retry recovery and hosted CI |
+| Prodigal: dimensional modelling and historical data | Declared source/session/week grains and preserved revisions | Goal dimension history and additional health observations |
 
 ## Gate 1 — completed locally
 
 Synthetic JSONL → validated revisions → point-in-time current sessions → weekly summaries. Nineteen tests and deterministic demo pass. The sample running total changes from one session / 5,000 metres to two sessions / 8,000 metres after a 6,000-metre correction and a late 2,000-metre session. The earlier historical result remains 5,000 metres. Phone/watch duplicates sharing an explicit session ID count once.
 
-## Gate 2 — next, dependency blocked
+## Gate 2 — completed locally
 
-Install and lock a tested dbt/DuckDB stack. Port the normalized SQL into staging/intermediate/mart models with source declarations, grain/relationship tests and generated lineage. Re-run the same fixture scenarios against the actual adapter. Use the current full refresh as an oracle for incremental affected-week replacement, including old and new week removal when timestamps change.
-
-The attempted dbt-duckdb 1.9.6 installation failed at PyPI DNS resolution in the restricted session. No installed-version or successful dbt execution claim is made. Resolve environment package access before this gate, rather than substituting mock dbt results.
+Real dbt/DuckDB execution now passes three models and 13 tests in each of eight fixture scenarios, matching the SQLite full-refresh oracle. Incremental target replacement includes obsolete group deletion after moved weeks and erasure. Documentation/catalog/lineage generation succeeds. The earlier network blocker is resolved. See [verification and limits](DBT-VERIFICATION.md).
 
 ## Gate 3 — operations
 
@@ -29,4 +27,4 @@ HealthKit/native app integration, authenticated summary API, strength-set grain,
 
 ## Incremental SQL milestone — completed locally
 
-The SQLite mart now replaces affected user/week/activity groups and tracks the last successful cutoff with a session snapshot. Twenty-four tests pass, including full-refresh equivalence, unchanged replay, source-priority changes, correction across week boundaries, erasure, backward-cutoff rejection and atomic failure/recovery. The synthetic demonstration rebuilds two groups initially, one after corrections/late arrival and zero on unchanged replay. Actual dbt installation was retried and remains blocked by restricted package-network access. Airflow is still pending.
+The SQLite mart now replaces affected user/week/activity groups and tracks the last successful cutoff with a session snapshot. Twenty-four tests pass, including full-refresh equivalence, unchanged replay, source-priority changes, correction across week boundaries, erasure, backward-cutoff rejection and atomic failure/recovery. The synthetic demonstration rebuilds two groups initially, one after corrections/late arrival and zero on unchanged replay. The initial dependency blocker was later resolved and Gate 2 is verified above. Airflow is still pending.

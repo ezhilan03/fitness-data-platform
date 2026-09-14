@@ -1,6 +1,6 @@
 # Fitness Data Platform
 
-A local, synthetic data-engineering project for reliable workout history and weekly summaries. **Local ingestion and incremental SQL milestones are implemented and tested.** This is not a completed cloud product, HealthKit integration, or medical recommendation system.
+A local, synthetic data-engineering project for reliable workout history and weekly summaries. **Local ingestion, incremental SQL and real dbt/DuckDB milestones are implemented and tested.** This is not a completed cloud product, HealthKit integration, or medical recommendation system.
 
 ## Run now
 
@@ -48,13 +48,23 @@ Manual records win over watch records, which win over phone records, only when t
 
 Erasure is logical within the live database, not forensic disk sanitization. Hash tombstones retain replay-suppression metadata. External files, exported reports and backups require a separate retention/erasure design before real health data is introduced.
 
+## Real dbt verification
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dbt.lock
+.venv/bin/python -m fitness.dbt_demo
+```
+
+Three actual dbt models and 13 data tests pass in each of eight synthetic scenarios, with exact result parity against SQLite full refresh. Corrections, late arrivals, historical cutoffs, replay, moved weeks, obsolete group removal and erasure are covered. Documentation and lineage generation also pass. Dependencies are pinned; the previous package-network blocker is resolved.
+
+[dbt verification report](artifacts/dbt-report.json) · [Design and limits](docs/DBT-VERIFICATION.md)
+
 ## Next gates
 
-1. Run these same fixtures through real dbt models and tests, preserving the SQL baseline results.
-2. Port the now-verified affected-week replacement to the actual dbt adapter, retaining full-refresh parity tests.
-3. Run Airflow interval/retry/backfill and freshness-alert exercises.
-4. Verify Docker and hosted CI, then authenticated summary delivery and budgeted cloud operations.
+1. Run Airflow interval/retry/backfill and freshness-alert exercises.
+2. Verify Docker and hosted CI, then authenticated summary delivery and budgeted cloud operations.
 
-Package installation failed in this session because the restricted environment could not resolve PyPI. **dbt and Airflow are not installed or verified here.** The [official dbt-duckdb adapter](https://github.com/duckdb/dbt-duckdb) is the planned local transformation runtime once dependencies are available. No cloud resources were created. CI and Docker definitions are supplied but have not run.
+Airflow remains pending. No cloud resources were created. CI includes the dbt regression but has not run on GitHub. The Docker definition currently covers the standard-library baseline and remains unverified locally.
 
 For the incremental command, use `python3 -m fitness --database fitness.db summarize --as-of 2030-01-01T00:00:00Z --incremental`. Local deletion also removes the subject from the incremental snapshot. Snapshot, aggregates and watermark roll back together on failure.

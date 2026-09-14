@@ -4,3 +4,6 @@ version = "0.1.0"
 description = "Synthetic workout ingestion and point-in-time weekly summaries"
 requires-python = ">=3.11"
 dependencies = []
+
+[project.optional-dependencies]
+dbt = ["dbt-core==1.12.4", "dbt-duckdb==1.9.6", "duckdb==1.5.5"]

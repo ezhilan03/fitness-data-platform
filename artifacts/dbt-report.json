@@ -1,0 +1,91 @@
+{
+  "synthetic_only": true,
+  "scenarios": [
+    {
+      "name": "initial",
+      "source_revisions": 3,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "replay",
+      "source_revisions": 3,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "correction_and_late_arrival",
+      "source_revisions": 5,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "historical_cutoff",
+      "source_revisions": 5,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "return_to_current",
+      "source_revisions": 5,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "moved_week",
+      "source_revisions": 6,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 3
+    },
+    {
+      "name": "obsolete_week_removed",
+      "source_revisions": 7,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 2
+    },
+    {
+      "name": "erasure",
+      "source_revisions": 0,
+      "tests_passed": 13,
+      "models": 3,
+      "matches_sqlite_full_refresh": true,
+      "groups": 0
+    }
+  ],
+  "passed": true,
+  "versions": {
+    "dbt_core": "1.12.4",
+    "dbt_duckdb": "1.9.6",
+    "duckdb": "1.5.5"
+  },
+  "documentation": {
+    "generated": true,
+    "catalog_models": 3,
+    "catalog_sources": 1,
+    "lineage": {
+      "model.fitness.current_sessions": [
+        "model.fitness.stg_revisions"
+      ],
+      "model.fitness.weekly_summaries": [
+        "model.fitness.current_sessions"
+      ],
+      "model.fitness.stg_revisions": [
+        "source.fitness.fitness_raw.revisions"
+      ]
+    }
+  }
+}

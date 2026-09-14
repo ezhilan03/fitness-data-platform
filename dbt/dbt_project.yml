@@ -1,0 +1,13 @@
+name: fitness
+version: '0.2.0'
+config-version: 2
+profile: fitness
+model-paths: [models]
+test-paths: [tests]
+macro-paths: [macros]
+models:
+  fitness:
+    +materialized: view
+    +persist_docs:
+      relation: true
+      columns: true

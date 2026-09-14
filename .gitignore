@@ -5,3 +5,8 @@ __pycache__/
 *.db-*
 .pytest_cache/
 artifacts/local/
+*.duckdb
+*.duckdb.wal
+dbt/target/
+dbt/logs/
+dbt/.user.yml

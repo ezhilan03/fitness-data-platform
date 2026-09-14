@@ -18,7 +18,7 @@ The ordinary ingestion command records the actual receipt time; choose a summary
 
 ## Implemented evidence
 
-- 24 passing tests, including conflict rollback and injected summary-write failure/recovery.
+- 26 passing tests, including conflict rollback and injected summary-write failure/recovery.
 - Source revisions are appended atomically; identical exports replay without duplicate totals.
 - A correction changes the current result without overwriting the historical revision.
 - Event time, source availability and local receipt time are separate. Historical selection filters knowledge timestamps before selecting the latest revision.
@@ -59,6 +59,10 @@ python3 -m venv .venv
 Three actual dbt models and 13 data tests pass in each of eight synthetic scenarios, with exact result parity against SQLite full refresh. Corrections, late arrivals, historical cutoffs, replay, moved weeks, obsolete group removal and erasure are covered. Documentation and lineage generation also pass. Dependencies are pinned; the previous package-network blocker is resolved.
 
 [dbt verification report](artifacts/dbt-report.json) · [Design and limits](docs/DBT-VERIFICATION.md)
+
+## Interval operations
+
+The local interval runner adds export-heartbeat freshness checks, isolated dbt runs and a latest-successful-publication pointer. See [operations design and verification limits](docs/OPERATIONS.md). Run `.venv/bin/python -m fitness.operations_demo` for actual dbt failure-gate/recovery evidence. Airflow installation is currently blocked by package-network restrictions; its DAG is prepared but unverified.
 
 ## Next gates
 

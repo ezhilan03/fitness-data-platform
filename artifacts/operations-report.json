@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "synthetic_only": true,
+  "actual_dbt_runs": 2,
+  "initial": {
+    "interval_start": "2026-09-08T00:00:00Z",
+    "interval_end": "2026-09-09T00:00:00Z",
+    "freshness": {
+      "watch": {
+        "age_seconds": 43200.0,
+        "fresh": true
+      }
+    },
+    "status": "success",
+    "models": 3,
+    "tests_passed": 13
+  },
+  "recovery": {
+    "interval_start": "2026-09-08T00:00:00Z",
+    "interval_end": "2026-09-09T00:00:00Z",
+    "freshness": {
+      "watch": {
+        "age_seconds": 43200.0,
+        "fresh": true
+      }
+    },
+    "status": "success",
+    "models": 3,
+    "tests_passed": 13
+  },
+  "stale_failure_preserved_latest": true,
+  "local_alert_files": 1,
+  "airflow_executed": false,
+  "note": "Direct Python interval runs; no scheduler retry or backfill execution claimed."
+}

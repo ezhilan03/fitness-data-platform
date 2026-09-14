@@ -15,6 +15,7 @@ jobs:
       - run: python -m fitness.incremental_demo > incremental-report.json
       - run: python -m pip install -r requirements-dbt.lock
       - run: python -m fitness.dbt_demo
+      - run: python -m fitness.operations_demo
       - run: docker build -t fitness-data .
       - run: docker run --rm fitness-data python -m unittest discover -s tests -v
       - run: docker run --rm fitness-data
@@ -25,6 +26,7 @@ jobs:
             demo-report.json
             incremental-report.json
             artifacts/dbt-report.json
+            artifacts/operations-report.json
             artifacts/local/dbt/**/build.log
             artifacts/local/dbt/erasure/target/manifest.json
             artifacts/local/dbt/erasure/target/catalog.json

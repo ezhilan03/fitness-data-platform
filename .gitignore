@@ -10,3 +10,5 @@ artifacts/local/
 dbt/target/
 dbt/logs/
 dbt/.user.yml
+
+.venv-airflow/
